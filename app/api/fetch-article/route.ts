@@ -196,75 +196,21 @@ function extractArticleContent(html: string): string | null {
           }
         }
       }
-    }
-  }
+ // 최종 필터링: 불필요한 정보 제거 (더 강력하게)
+if (!content || content.length < 100) {
+  return null
+}
 
-  if (!content || content.length < 100) {
-    return null
-  }
+const filteredContent = content
+  // ... (모든 replace 체인)
+  .trim()
 
-  // 최종 필터링: 불필요한 정보 제거 (더 강력하게)
-  content = content
-    // 이메일 주소 제거
-    .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '')
-    // 전화번호 제거
-    .replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '')
-    // URL 제거
-    .replace(/https?:\/\/[^\s]+/gi, '')
-    .replace(/www\.[^\s]+/gi, '')
-    // 날짜/시간 메타데이터 제거
-    .replace(/Updated?\s+[^\n]{0,50}/gi, '')
-    .replace(/Published?\s+[^\n]{0,50}/gi, '')
-    .replace(/Last\s+updated?[^\n]{0,50}/gi, '')
-    .replace(/\d{1,2}:\d{2}\s*(?:AM|PM)\s*[A-Z]{2,4},?\s*[A-Z][a-z]+\s+\d{1,2},?\s+\d{4}/g, '')
-    // "Add [source] on Google" 같은 패턴 제거
-    .replace(/Add\s+[A-Z][^\n]{0,30}\s+on\s+Google[^\n]{0,50}/gi, '')
-    .replace(/Add\s+[A-Z][^\n]{0,30}\s+as\s+your\s+preferred\s+source[^\n]{0,100}/gi, '')
-    // UI 버튼 텍스트 제거
-    .replace(/^(?:Share|Copy|Link copied|Print|Email|Save|Bookmark)$/gim, '')
-    .replace(/^(?:Share|Copy|Print|Email|Save|Bookmark)\s*$/gim, '')
-    // 소셜 미디어 플랫폼 이름만 있는 줄 제거
-    .replace(/^(?:LinkedIn|Bluesky|Flipboard|Reddit|Twitter|Facebook|Instagram|Pinterest|YouTube|TikTok|Snapchat|WhatsApp|Telegram)$/gim, '')
-    // 소셜 미디어 관련 문구 제거
-    .replace(/(?:Follow|Like|Share|Tweet|Connect|Subscribe)[\s\w]*on[\s\w]*(?:Facebook|Twitter|Instagram|LinkedIn|Pinterest|YouTube)[\s\S]{0,50}/gi, '')
-    // 댓글 관련 문구 제거
-    .replace(/(?:Comment|Comments|Leave a comment|Add your comment|Join the discussion)[\s\S]{0,100}/gi, '')
-    // 관련 기사 관련 문구 제거
-    .replace(/(?:Related articles|Read more|More from|You might also like|Recommended for you|See also)[\s\S]{0,200}/gi, '')
-    // 구독 관련 문구 제거
-    .replace(/(?:Subscribe to|Newsletter|Sign up for|Get our newsletter|Email updates)[\s\S]{0,150}/gi, '')
-    // 저작권 정보 제거
-    .replace(/(?:Copyright|©|All rights reserved|Terms of Service|Privacy Policy)[\s\S]{0,100}/gi, '')
-    // 위치 정보 제거 (예: "TAIPEI, Taiwan (AP) —")
-    .replace(/^[A-Z][A-Z\s,]+\([A-Z]+\)\s*—?\s*/gm, '')
-    .replace(/^[A-Z][A-Z\s,]+—\s*/gm, '')
-    // 기자 정보/바이오 제거 (문단 시작이 이름이고 "is a" 또는 "reporter" 포함)
-    .replace(/^[A-Z][a-z]+\s+[A-Z][a-z]+\s+is\s+a[^\n]{0,200}/gim, '')
-    .replace(/^[A-Z][a-z]+\s+is\s+a[^\n]{0,200}/gim, '')
-    .replace(/^[A-Z][a-z]+\s+[A-Z][a-z]+\s+has\s+reported[^\n]{0,200}/gim, '')
-    .replace(/^[A-Z][a-z]+\s+has\s+reported[^\n]{0,200}/gim, '')
-    .replace(/^[A-Z][a-z]+\s+[A-Z][a-z]+\s+is\s+based[^\n]{0,200}/gim, '')
-    .replace(/^[A-Z][a-z]+\s+is\s+based[^\n]{0,200}/gim, '')
-    // "reporter for" 패턴 제거
-    .replace(/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\s+is\s+a\s+[^\n]{0,50}\s+reporter\s+for[^\n]{0,200}/gim, '')
-    // "She has reported" 같은 패턴 제거
-    .replace(/^(?:She|He|They)\s+has\s+reported[^\n]{0,200}/gim, '')
-    // 연속된 공백 정리
-    .replace(/[ \t]+/g, ' ')
-    // 빈 줄 제거
-    .replace(/^\s*$/gm, '')
-    // 문장 끝 후 대문자로 시작하면 문단 구분
-    .replace(/\.\s+([A-Z][a-z])/g, '.\n\n$1')
-    .replace(/\?\s+([A-Z][a-z])/g, '?\n\n$1')
-    .replace(/!\s+([A-Z][a-z])/g, '!\n\n$1')
-    // 연속된 줄바꿈 정리
-    .replace(/\n{3,}/g, '\n\n')
-    // 앞뒤 공백 정리
-    .trim()
+// 최종 길이 체크 (너무 짧으면 null 반환)
+if (!filteredContent || filteredContent.length < 100) {
+  return null
+}
 
-  // 최종 길이 체크 (너무 짧으면 null 반환)
-  if (content.length < 100) {
-    return null
+return filteredContent
   }
 
   return content
