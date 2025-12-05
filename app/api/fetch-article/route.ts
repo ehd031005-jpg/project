@@ -117,33 +117,28 @@ function extractArticleContent(html: string): string | null {
   let bestLength = 0
   
   // 패턴 순서대로 시도하고 가장 긴 것을 선택
+  // 1) 미리 정의한 패턴들로 기사 본문을 우선적으로 추출
   for (const pattern of patterns) {
-  const matches = Array.from(
-    cleaned.matchAll(new RegExp(pattern.source, 'gi'))
-  )
+    const regex = new RegExp(pattern.source, 'gi')
+    const matches = Array.from(cleaned.matchAll(regex))
 
-  for (const match of matches) {
-    if (match && match[1]) {
-      const text = extractTextFromHtml(match[1])
-      // ...
-    }
-  }
-}
-
+    for (const match of matches) {
+      if (match && match[1]) {
+        const text = extractTextFromHtml(match[1])
         // 충분한 길이이고 이전보다 길면 선택
-        if (text.length > 200 && text.length > bestLength) {
-          // 링크 비율 확인
-          const linkCount = (match[1].match(/<a[^>]*>/gi) || []).length
-          if (linkCount < text.length / 80) { // 링크 비율이 너무 높지 않으면
-            bestLength = text.length
-            bestMatch = match[1]
-            content = text
-          }
+        if (
+          text.length >= MIN_ARTICLE_LENGTH &&
+          text.length > bestContent.length
+        ) {
+          bestContent = text
         }
       }
     }
   }
 
+  // 패턴으로 찾지 못한 경우, p 태그들을 모아서 기사 본문 찾기
+  if (!bestContent) {
+    // 여기부터는 원래 있던 p 태그 처리 로직이 계속 이어질 거야
   // 패턴으로 찾지 못한 경우, p 태그들을 모아서 기사 본문 찾기
   if (!content || content.length < 200) {
     // p 태그들을 모아서 긴 문단 찾기 (가장 신뢰할 수 있는 방법)
