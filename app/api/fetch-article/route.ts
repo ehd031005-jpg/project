@@ -118,10 +118,18 @@ function extractArticleContent(html: string): string | null {
   
   // 패턴 순서대로 시도하고 가장 긴 것을 선택
   for (const pattern of patterns) {
-    const matches = cleaned.matchAll(new RegExp(pattern.source, 'gi'))
-    for (const match of matches) {
-      if (match && match[1]) {
-        const text = extractTextFromHtml(match[1])
+  const matches = Array.from(
+    cleaned.matchAll(new RegExp(pattern.source, 'gi'))
+  )
+
+  for (const match of matches) {
+    if (match && match[1]) {
+      const text = extractTextFromHtml(match[1])
+      // ...
+    }
+  }
+}
+
         // 충분한 길이이고 이전보다 길면 선택
         if (text.length > 200 && text.length > bestLength) {
           // 링크 비율 확인
