@@ -360,4 +360,4 @@ function extractTextFromHtml(html: string): string {
   
   return text
 }
-
+}
